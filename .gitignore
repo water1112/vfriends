@@ -1,0 +1,6 @@
+node_modules/
+.env
+uploads/
+src/data/profiles/*.json
+src/data/personas/*.json
+.claude/
