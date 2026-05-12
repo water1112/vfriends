@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 人格画像 & 虚拟好友</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <nav class="sidebar">
+      <div class="sidebar-title"><span>AI</span> 人格画像</div>
+      <button class="nav-item active" data-page="analyze" onclick="showPage('analyze')">
+        <span class="icon">&#x1F4CA;</span> 聊天分析
+      </button>
+      <button class="nav-item" data-page="image" onclick="showPage('image')">
+        <span class="icon">&#x1F5BC;</span> 图片分析
+      </button>
+      <button class="nav-item" data-page="profile" onclick="showPage('profile')">
+        <span class="icon">&#x1F9E0;</span> 人格画像
+      </button>
+      <button class="nav-item" data-page="persona" onclick="showPage('persona')">
+        <span class="icon">&#x1F464;</span> 虚拟好友
+      </button>
+      <button class="nav-item" data-page="chat" onclick="showPage('chat')">
+        <span class="icon">&#x1F4AC;</span> 陪聊
+      </button>
+    </nav>
+
+    <main class="main">
+      <!-- 聊天分析页 -->
+      <div id="page-analyze" class="page active">
+        <h1 class="page-title">聊天记录分析</h1>
+        <p class="page-desc">粘贴聊天记录，自动脱敏并分析语言风格、三观情绪、社交行为</p>
+
+        <div class="card">
+          <div class="form-group">
+            <label>聊天记录内容</label>
+            <textarea id="chatInput" placeholder="粘贴聊天记录文本..."></textarea>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="analyzeChat()">开始分析</button>
+            <button class="btn btn-secondary" onclick="clearChat()">清空</button>
+          </div>
+        </div>
+
+        <div id="analysisResult" style="display:none">
+          <div class="card">
+            <div class="card-title">隐私脱敏</div>
+            <div id="privacyResult"></div>
+          </div>
+          <div class="profile-grid">
+            <div class="card">
+              <div class="card-title">语言风格</div>
+              <div id="langResult"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">三观情绪</div>
+              <div id="emotionResult"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">社交行为</div>
+            <div id="socialResult"></div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="buildProfile()">生成综合画像</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 图片分析页 -->
+      <div id="page-image" class="page">
+        <h1 class="page-title">图片分析</h1>
+        <p class="page-desc">上传人像照片或场景图片，或输入图片描述进行性格洞察</p>
+
+        <div class="card">
+          <div class="form-group">
+            <label>分析类型</label>
+            <div class="btn-group" style="margin-top:0">
+              <button class="btn btn-primary" id="btnPortrait" onclick="setImageType('portrait')">人像分析</button>
+              <button class="btn btn-secondary" id="btnScene" onclick="setImageType('scene')">场景分析</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>上传图片</label>
+            <input type="file" id="imageFile" accept="image/*">
+          </div>
+          <div class="form-group">
+            <label>或输入图片描述</label>
+            <textarea id="imageDesc" placeholder="描述图片内容..." style="min-height:100px"></textarea>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="analyzeImage()">分析图片</button>
+          </div>
+        </div>
+
+        <div id="imageResult" style="display:none">
+          <div class="card">
+            <div class="card-title">分析结果</div>
+            <div id="imageResultContent"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 人格画像页 -->
+      <div id="page-profile" class="page">
+        <h1 class="page-title">综合人格画像</h1>
+        <p class="page-desc">基于多维度分析生成的完整人格画像</p>
+
+        <div id="profileEmpty" class="card">
+          <p style="color:var(--muted);text-align:center;padding:40px 0">
+            请先完成聊天分析或图片分析，再生成综合画像
+          </p>
+        </div>
+
+        <div id="profileDisplay" style="display:none">
+          <div class="card">
+            <div class="card-title">大五人格</div>
+            <div id="bigFive"></div>
+          </div>
+          <div class="profile-grid">
+            <div class="card">
+              <div class="card-title">核心特质</div>
+              <div id="coreTraits"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">MBTI 倾向</div>
+              <div id="mbtiResult" style="font-size:36px;font-weight:600;color:var(--primary);text-align:center;padding:20px 0"></div>
+            </div>
+          </div>
+          <div class="profile-grid">
+            <div class="card">
+              <div class="card-title">优势</div>
+              <div id="strengths"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">潜在挑战</div>
+              <div id="challenges"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">人格总结</div>
+            <div id="summary" style="font-size:18px;color:var(--body);line-height:1.6"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">标签云</div>
+            <div id="tagCloud"></div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="createPersona()">生成虚拟好友</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 虚拟好友页 -->
+      <div id="page-persona" class="page">
+        <h1 class="page-title">虚拟好友</h1>
+        <p class="page-desc">基于人格画像生成的匹配虚拟好友人设</p>
+
+        <div id="personaEmpty" class="card">
+          <p style="color:var(--muted);text-align:center;padding:40px 0">
+            请先生成人格画像，再创建虚拟好友
+          </p>
+        </div>
+
+        <div id="personaDisplay" style="display:none">
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+              <div class="chat-avatar" style="width:64px;height:64px;font-size:24px" id="personaAvatar"></div>
+              <div>
+                <div style="font-size:22px;font-weight:500" id="personaName"></div>
+                <div style="color:var(--muted)" id="personaAge"></div>
+              </div>
+            </div>
+            <div id="personaInfo"></div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="startChat()">开始陪聊</button>
+            <button class="btn btn-secondary" onclick="iteratePersona()">迭代优化</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 陪聊页 -->
+      <div id="page-chat" class="page">
+        <div class="chat-container">
+          <div class="chat-header">
+            <div class="chat-avatar" id="chatAvatar">?</div>
+            <div>
+              <div class="chat-name" id="chatName">虚拟好友</div>
+              <div class="chat-status">在线</div>
+            </div>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div style="text-align:center;color:var(--muted);padding:40px 0">
+              开始和你的虚拟好友聊天吧
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" id="chatMsgInput" placeholder="输入消息..." onkeydown="if(event.key==='Enter')sendMessage()">
+            <button class="btn btn-primary" onclick="sendMessage()">发送</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="loading-overlay" id="loading" style="display:none">
+    <div class="spinner" style="width:32px;height:32px"></div>
+    <div id="loadingText">分析中...</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
